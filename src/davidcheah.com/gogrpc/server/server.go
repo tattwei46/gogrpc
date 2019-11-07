@@ -25,10 +25,13 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 	"strconv"
 
 	accountpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -78,8 +81,24 @@ func (s *AccountServiceServer) ListAccounts(req *accountpb.ListAccountsReq, stre
 
 	return nil
 }
+func handleGet(c *gin.Context) {
+	c.String(http.StatusOK, "test\n")
+}
 
 func main() {
+
+	//rest
+	go func() {
+		router := gin.Default()
+		api := router.Group("/api")
+		{
+			api.GET("/account/test", handleGet)
+		}
+
+		router.Run()
+	}()
+
+	//grpc
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -90,4 +109,5 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }
