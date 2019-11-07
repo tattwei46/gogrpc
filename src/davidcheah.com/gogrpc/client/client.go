@@ -22,16 +22,14 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"time"
 
-	pb "davidcheah.com/gogrpc/api"
+	accountpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
 )
 
 const (
-	address     = "localhost:50051"
-	defaultName = "world"
+	address = "localhost:50051"
 )
 
 func main() {
@@ -41,18 +39,13 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := pb.NewGreeterClient(conn)
+	c := accountpb.NewAccountServiceClient(conn)
 
-	// Contact the server and print out its response.
-	name := defaultName
-	if len(os.Args) > 1 {
-		name = os.Args[1]
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: name})
+	res, err := c.ReadAccount(ctx, &accountpb.ReadAccountReq{Id: "1"})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Greeting: %s", r.GetMessage())
+	log.Printf("Response: %s", res)
 }

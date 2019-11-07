@@ -26,23 +26,35 @@ import (
 	"log"
 	"net"
 
+	accountpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
-	pb "davidcheah.com/gogrpc/api"
 )
 
 const (
 	port = ":50051"
 )
 
-// server is used to implement helloworld.GreeterServer.
-type server struct {
-	pb.UnimplementedGreeterServer
+type Account struct {
+	ID       string `bson:"_id,omitempty"`
+	UserID   string `bson:"author_id"`
+	Email    string `bson:"content"`
+	Password string `bson:"title"`
 }
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
+type AccountServiceServer struct {
+}
+
+func (s *AccountServiceServer) ReadAccount(ctx context.Context, req *accountpb.ReadAccountReq) (*accountpb.ReadAccountRes, error) {
+	response := &accountpb.ReadAccountRes{
+		Account: &accountpb.Account{
+			Id:       "1",
+			UserId:   "1",
+			Email:    "Test",
+			Password: "Test",
+		},
+	}
+
+	return response, nil
 }
 
 func main() {
@@ -51,7 +63,8 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	srv := &AccountServiceServer{}
+	accountpb.RegisterAccountServiceServer(s, srv)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
