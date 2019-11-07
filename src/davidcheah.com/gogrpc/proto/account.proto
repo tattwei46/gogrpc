@@ -40,4 +40,5 @@ message ReadAccountRes {
 
 service AccountService {
   rpc ReadAccount (ReadAccountReq) returns (ReadAccountRes);
+  rpc ListAccounts (ListAccountsReq) returns (stream ListAccountsRes);
 }

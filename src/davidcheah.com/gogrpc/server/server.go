@@ -25,6 +25,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"strconv"
 
 	accountpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
@@ -55,6 +56,22 @@ func (s *AccountServiceServer) ReadAccount(ctx context.Context, req *accountpb.R
 	}
 
 	return response, nil
+}
+
+func (s *AccountServiceServer) ListAccounts(req *accountpb.ListAccountsReq, stream accountpb.AccountService_ListAccountsServer) error {
+
+	for i := 0; i < 100000; i++ {
+		stream.Send(&accountpb.ListAccountsRes{
+			Account: &accountpb.Account{
+				Id:       strconv.Itoa(i),
+				UserId:   strconv.Itoa(i),
+				Email:    "Test",
+				Password: "Test",
+			},
+		})
+	}
+
+	return nil
 }
 
 func main() {

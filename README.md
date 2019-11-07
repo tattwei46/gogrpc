@@ -14,3 +14,6 @@
 
 # **Compile .proto and generate .pb.go**
 1. protoc -I api/     -I${GOPATH}/src     --go_out=plugins=grpc:api     api/api.proto
+
+
+protoc -I proto/     -I${GOPATH}/src     --go_out=plugins=grpc:proto     proto/account.proto

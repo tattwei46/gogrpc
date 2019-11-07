@@ -21,8 +21,8 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
-	"time"
 
 	accountpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
@@ -41,11 +41,36 @@ func main() {
 	defer conn.Close()
 	c := accountpb.NewAccountServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	//listAccounts(ctx, c)
+	readAccount(ctx, c)
+
+}
+func listAccounts(ctx context.Context, c accountpb.AccountServiceClient) {
+	req := &accountpb.ListAccountsReq{}
+	stream, err := c.ListAccounts(ctx, req)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	for {
+		res, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+		log.Printf("Response: %s", res.GetAccount())
+	}
+}
+
+func readAccount(ctx context.Context, c accountpb.AccountServiceClient) {
 	res, err := c.ReadAccount(ctx, &accountpb.ReadAccountReq{Id: "1"})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Response: %s", res)
+	log.Printf("Response: %s", res.GetAccount())
 }
