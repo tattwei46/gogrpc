@@ -39,6 +39,7 @@ message ReadAccountRes {
 }
 
 service AccountService {
+  rpc CreateAccount (CreateAccountReq) returns (CreateAccountRes);
   rpc ReadAccount (ReadAccountReq) returns (ReadAccountRes);
   rpc ListAccounts (ListAccountsReq) returns (stream ListAccountsRes);
 }

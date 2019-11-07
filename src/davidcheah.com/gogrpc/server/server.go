@@ -45,6 +45,11 @@ type Account struct {
 type AccountServiceServer struct {
 }
 
+func (s *AccountServiceServer) CreateAccount(ctx context.Context, req *accountpb.CreateAccountReq) (*accountpb.CreateAccountRes, error) {
+	account := req.GetAccount()
+	return &accountpb.CreateAccountRes{Account: account}, nil
+}
+
 func (s *AccountServiceServer) ReadAccount(ctx context.Context, req *accountpb.ReadAccountReq) (*accountpb.ReadAccountRes, error) {
 	response := &accountpb.ReadAccountRes{
 		Account: &accountpb.Account{

@@ -45,7 +45,8 @@ func main() {
 	defer cancel()
 
 	//listAccounts(ctx, c)
-	readAccount(ctx, c)
+	//readAccount(ctx, c)
+	createAccount(ctx, c)
 
 }
 func listAccounts(ctx context.Context, c accountpb.AccountServiceClient) {
@@ -69,6 +70,20 @@ func listAccounts(ctx context.Context, c accountpb.AccountServiceClient) {
 
 func readAccount(ctx context.Context, c accountpb.AccountServiceClient) {
 	res, err := c.ReadAccount(ctx, &accountpb.ReadAccountReq{Id: "1"})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	log.Printf("Response: %s", res.GetAccount())
+}
+
+func createAccount(ctx context.Context, c accountpb.AccountServiceClient) {
+	account := &accountpb.Account{
+		Id:       "999",
+		UserId:   "999",
+		Email:    "999",
+		Password: "999",
+	}
+	res, err := c.CreateAccount(ctx, &accountpb.CreateAccountReq{Account: account})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
