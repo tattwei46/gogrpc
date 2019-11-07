@@ -24,7 +24,7 @@ import (
 	"io"
 	"log"
 
-	accountpb "davidcheah.com/gogrpc/proto"
+	userpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
 )
 
@@ -39,19 +39,19 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := accountpb.NewAccountServiceClient(conn)
+	c := userpb.NewUserServiceClient(conn)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	//listAccounts(ctx, c)
-	//readAccount(ctx, c)
-	createAccount(ctx, c)
+	listUsers(ctx, c)
+	//readUser(ctx, c)
+	//createUser(ctx, c)
 
 }
-func listAccounts(ctx context.Context, c accountpb.AccountServiceClient) {
-	req := &accountpb.ListAccountsReq{}
-	stream, err := c.ListAccounts(ctx, req)
+func listUsers(ctx context.Context, c userpb.UserServiceClient) {
+	req := &userpb.ListUsersReq{}
+	stream, err := c.ListUsers(ctx, req)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -64,28 +64,28 @@ func listAccounts(ctx context.Context, c accountpb.AccountServiceClient) {
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
-		log.Printf("Response: %s", res.GetAccount())
+		log.Printf("Response: %s", res.GetUser())
 	}
 }
 
-func readAccount(ctx context.Context, c accountpb.AccountServiceClient) {
-	res, err := c.ReadAccount(ctx, &accountpb.ReadAccountReq{Id: "1"})
+func readUser(ctx context.Context, c userpb.UserServiceClient) {
+	res, err := c.ReadUser(ctx, &userpb.ReadUserReq{Id: "1"})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Response: %s", res.GetAccount())
+	log.Printf("Response: %s", res.GetUser())
 }
 
-func createAccount(ctx context.Context, c accountpb.AccountServiceClient) {
-	account := &accountpb.Account{
+func createUser(ctx context.Context, c userpb.UserServiceClient) {
+	User := &userpb.User{
 		Id:       "999",
 		UserId:   "999",
 		Email:    "999",
 		Password: "999",
 	}
-	res, err := c.CreateAccount(ctx, &accountpb.CreateAccountReq{Account: account})
+	res, err := c.CreateUser(ctx, &userpb.CreateUserReq{User: User})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Response: %s", res.GetAccount())
+	log.Printf("Response: %s", res.GetUser())
 }

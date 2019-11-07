@@ -28,7 +28,7 @@ import (
 	"net/http"
 	"strconv"
 
-	accountpb "davidcheah.com/gogrpc/proto"
+	userpb "davidcheah.com/gogrpc/proto"
 	"google.golang.org/grpc"
 
 	"github.com/gin-gonic/gin"
@@ -38,24 +38,24 @@ const (
 	port = ":50051"
 )
 
-type Account struct {
+type User struct {
 	ID       string `bson:"_id,omitempty"`
 	UserID   string `bson:"author_id"`
 	Email    string `bson:"content"`
 	Password string `bson:"title"`
 }
 
-type AccountServiceServer struct {
+type UserServiceServer struct {
 }
 
-func (s *AccountServiceServer) CreateAccount(ctx context.Context, req *accountpb.CreateAccountReq) (*accountpb.CreateAccountRes, error) {
-	account := req.GetAccount()
-	return &accountpb.CreateAccountRes{Account: account}, nil
+func (s *UserServiceServer) CreateUser(ctx context.Context, req *userpb.CreateUserReq) (*userpb.CreateUserRes, error) {
+	user := req.GetUser()
+	return &userpb.CreateUserRes{User: user}, nil
 }
 
-func (s *AccountServiceServer) ReadAccount(ctx context.Context, req *accountpb.ReadAccountReq) (*accountpb.ReadAccountRes, error) {
-	response := &accountpb.ReadAccountRes{
-		Account: &accountpb.Account{
+func (s *UserServiceServer) ReadUser(ctx context.Context, req *userpb.ReadUserReq) (*userpb.ReadUserRes, error) {
+	response := &userpb.ReadUserRes{
+		User: &userpb.User{
 			Id:       "1",
 			UserId:   "1",
 			Email:    "Test",
@@ -66,11 +66,11 @@ func (s *AccountServiceServer) ReadAccount(ctx context.Context, req *accountpb.R
 	return response, nil
 }
 
-func (s *AccountServiceServer) ListAccounts(req *accountpb.ListAccountsReq, stream accountpb.AccountService_ListAccountsServer) error {
+func (s *UserServiceServer) ListUsers(req *userpb.ListUsersReq, stream userpb.UserService_ListUsersServer) error {
 
 	for i := 0; i < 100000; i++ {
-		stream.Send(&accountpb.ListAccountsRes{
-			Account: &accountpb.Account{
+		stream.Send(&userpb.ListUsersRes{
+			User: &userpb.User{
 				Id:       strconv.Itoa(i),
 				UserId:   strconv.Itoa(i),
 				Email:    "Test",
@@ -92,7 +92,7 @@ func main() {
 		router := gin.Default()
 		api := router.Group("/api")
 		{
-			api.GET("/account/test", handleGet)
+			api.GET("/user/test", handleGet)
 		}
 
 		router.Run()
@@ -104,8 +104,8 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	srv := &AccountServiceServer{}
-	accountpb.RegisterAccountServiceServer(s, srv)
+	srv := &UserServiceServer{}
+	userpb.RegisterUserServiceServer(s, srv)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
