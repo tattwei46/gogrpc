@@ -13,7 +13,5 @@
 2. go get -u github.com/golang/protobuf/protoc-gen-go
 
 # **Compile .proto and generate .pb.go**
-1. protoc -I api/     -I${GOPATH}/src     --go_out=plugins=grpc:api     api/api.proto
-
-
-protoc -I proto/     -I${GOPATH}/src     --go_out=plugins=grpc:proto     proto/account.proto
+1. go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+2. protoc -I proto/     -I${GOPATH}/src    -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis    --go_out=google/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:proto     proto/user.proto

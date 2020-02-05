@@ -1,0 +1,37 @@
+syntax = "proto3";
+package proto;
+
+message User {
+  string id = 1;
+  string user_id = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message ListUsersReq {}
+
+message ListUsersRes {
+  User user = 1;
+}
+
+message CreateUserReq {
+  User user = 1;
+}
+
+message CreateUserRes {
+  User user = 1;
+}
+
+message ReadUserReq {
+  string id = 1;
+}
+
+message ReadUserRes {
+  User user = 1;
+}
+
+service UserService {
+  rpc CreateUser (CreateUserReq) returns (CreateUserRes);
+  rpc ReadUser (ReadUserReq) returns (ReadUserRes);
+  rpc ListUsers (ListUsersReq) returns (stream ListUsersRes);
+}
