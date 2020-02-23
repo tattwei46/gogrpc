@@ -24,6 +24,7 @@ func (h *Handler) Get(c *gin.Context) {
 	res, err := h.client.GetUser(c, "1")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": res})
 }
@@ -33,11 +34,13 @@ func (h *Handler) Create(c *gin.Context) {
 	err := c.BindJSON(&user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	err = h.client.CreateUser(c, user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }

@@ -2,10 +2,14 @@ package user
 
 import (
 	"context"
+	"go-grpc/constant"
+	"go-grpc/interceptor"
 	proto "go-grpc/user/pb"
+	"google.golang.org/grpc/metadata"
 	"io"
 	"log"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
@@ -15,7 +19,16 @@ type Client struct {
 }
 
 func NewClient(url string) (*Client, error) {
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
+
+	conn, err := grpc.Dial(url,
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(
+			grpc_middleware.ChainUnaryClient(
+				interceptor.ClientLogIntercept,
+			),
+		),
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +60,11 @@ func (c *Client) ListUsers(ctx context.Context) {
 }
 
 func (c *Client) GetUser(ctx context.Context, userID string) (User, error) {
-	res, err := c.client.GetUser(ctx, &proto.GetUserReq{Id: userID})
+
+	md := metadata.Pairs(constant.UsernameKey, constant.Username, constant.PasswordKey, constant.Password)
+	newCtx := metadata.NewOutgoingContext(ctx, md)
+
+	res, err := c.client.GetUser(newCtx, &proto.GetUserReq{Id: userID})
 	if err != nil {
 		return User{}, err
 	}
@@ -57,6 +74,10 @@ func (c *Client) GetUser(ctx context.Context, userID string) (User, error) {
 }
 
 func (c *Client) CreateUser(ctx context.Context, user User) error {
+
+	//md := metadata.Pairs(constant.UsernameKey, constant.Username, constant.PasswordKey, constant.Password)
+	//newCtx := metadata.NewOutgoingContext(ctx, md)
+
 	res, err := c.client.CreateUser(ctx, &proto.CreateUserReq{User: user.ToProto()})
 	if err != nil {
 		return err

@@ -4,9 +4,11 @@ package user
 import (
 	"context"
 	"fmt"
+	"go-grpc/interceptor"
 	"net"
 	"strconv"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	userpb "go-grpc/user/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/peer"
@@ -21,7 +23,16 @@ func ListenGRPC(s Service, port int) error {
 	if err != nil {
 		return err
 	}
-	serv := grpc.NewServer()
+
+	serv := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				interceptor.ServerLogIntercept,
+				interceptor.ServerRequestInfoIntercept,
+			),
+		),
+	)
+
 	userpb.RegisterUserServiceServer(serv, &grpcServer{s})
 	fmt.Printf("Listening and serving GRPC on %s\n", lis.Addr())
 	return serv.Serve(lis)

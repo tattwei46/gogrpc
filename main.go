@@ -23,6 +23,7 @@ func main() {
 }
 
 func setupRouter() *gin.Engine {
+	gin.DisableConsoleColor()
 	r := gin.Default()
 	api.CreateUserRoutes(r)
 	return r
